@@ -153,7 +153,7 @@ class GMambaBlock(nn.Module):
         h1 = self.dense1(input_tensor)
         g1 = self.conv1d(input_tensor.transpose(1, 2))
         g1 = g1.transpose(1, 2)
-        gru_input = self.conv1d(g1) 
+        #gru_input = self.conv1d(g1) 
     
         # [2048, n, 64] 再进行反转
         flipped_input = input_tensor.clone() #torch.Size([2048, 50, 64])
