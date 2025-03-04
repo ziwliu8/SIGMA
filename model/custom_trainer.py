@@ -85,7 +85,10 @@ class CustomTrainer(Trainer):
         for start, end in groups:
             group_mask = (item_lengths >= start) & (item_lengths < end)
             group_indices = np.where(group_mask)[0]
-            group_result, group_sample_count = self.evaluate_group(eval_data, group_indices)
+            if len(group_indices) == 0:
+                group_result, group_sample_count = 0, 0
+            else:
+                group_result, group_sample_count = self.evaluate_group(eval_data, group_indices)
             results[f'group_{start}_{end}'] = group_result
             self.logger.info(f"Group Len:{start} - {end} | Samples: {group_sample_count}: {group_result}")
         self.wandblogger.log_eval_metrics(result, head="eval")
@@ -95,6 +98,7 @@ class CustomTrainer(Trainer):
         # Create a subset of the dataset
         subset_inter_feat = eval_data.dataset.inter_feat[group_indices]
         subset_dataset = Dataset(config=eval_data.dataset.config)
+        subset_dataset._change_feat_format()
         subset_dataset.inter_feat = subset_inter_feat
         # Create a new FullSortEvalDataLoader for the subset
         subset_eval_data = FullSortEvalDataLoader(
